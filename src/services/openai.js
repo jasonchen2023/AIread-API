@@ -14,8 +14,17 @@ const response = await openai.createCompletion({
 });
 */
 
-const createCompletion;
+export default async function getSummary(content) {
+  const response = await openai.createCompletion({
+    model: 'davinci',
+    prompt: `Please summarize the following text:\n${content}`,
+    temperature: 0.5,
+    max_tokens: 60,
+    stop: ['\n'],
+  });
+
+  const summary = response.choices[0].text.trim();
+  return summary;
+}
+
 // streaming: https://github.com/openai/openai-node/issues/18#issuecomment-1369996933
-
-const createChatCompletion;
-
