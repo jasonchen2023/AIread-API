@@ -28,8 +28,8 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 // additional init stuff should go before hitting the routing
 
 // default index route
-app.get('/', (req, res) => {
-  res.send('Hello World');
+app.get('/gpt', (req, res) => {
+  res.json({ response: 'this is test data!' });
 });
 
 // START THE SERVER
