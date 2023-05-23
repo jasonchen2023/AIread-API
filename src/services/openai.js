@@ -10,13 +10,21 @@ const prompt = 'You are an AI summarization agent. Your goal is to distill infor
 /*
 const response = await openai.createCompletion({
   model: 'text-davinci-003',
-  prompt: 'Say this is a test',
-  temperature: 0,
-  max_tokens: 7,
+  prompt: 'Say this is a test'
 });
 */
 
-export default async function getSummary(content) {
+export async function getSummary(content, res) {
+  const summary = 'yeet!';
+
+  const chunk = {
+    content,
+    summary,
+  };
+  return chunk;
+}
+
+export async function promptOpenAI(content) {
   const response = await openai.createCompletion({
     model: 'davinci',
     prompt: `${prompt}\n${content}`,

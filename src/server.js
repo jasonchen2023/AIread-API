@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import apiRoutes from './router';
+import routes from './router';
 
 // .env setup
 dotenv.config({ silent: true });
@@ -32,7 +32,7 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 
 // ROUTING
 // =============================================================================
-app.use('/api', apiRoutes);
+app.use('/api', routes);
 // default index route
 app.get('/', (req, res) => {
   res.send('Hello World');

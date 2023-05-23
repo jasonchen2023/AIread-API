@@ -1,21 +1,67 @@
 import { Router } from 'express';
-import openai from './services/openai';
+import { getSummary } from './services/openai';
 
 const router = Router();
 
 router.get('/', (req, res) => {
-  res.json({ message: 'welcome to our blog api!' });
+  res.json({ message: 'welcome to the airead api!' });
 });
 
-/// your routes will go here
-
 // routes for /summaries
-//     post: return openai co
+//     post: return openai completion
+//     get: get openai completion, if exists?
 router.route('/summaries')
   .post(async (req, res) => {
     try {
-      openai.summarize(req.body.content);
+      const { content } = req.body.content; // pre processing of content
+      const chunk = await getSummary(content);
+      res.json(chunk);
     } catch (error) {
+      console.log(error.message);
+      res.status(500).json({ error });
+    }
+  })
+  .get(async (req, res) => {
+    try {
+      res.send('Hello World');
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
+
+// testing, move to openai.js later
+const testOpenAI = async (content) => {
+  // eslint-disable-next-line global-require
+  const { Configuration, OpenAIApi } = require('openai');
+
+  const configuration = new Configuration({ apiKey: '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' });
+  const openai = new OpenAIApi(configuration);
+
+  // const prompt = 'You are an AI summarization agent. Your goal is to distill information down for readers to accelerate learning and comphrehension. Please summarize the following text to bullets, while preserving as much important information as possible.';
+
+  const response = await openai.createCompletion({
+    model: 'text-davinci-003',
+    prompt: content,
+  });
+
+  const summary = response.data.choices[0].text.trim();
+
+  const chunk = {
+    content,
+    summary,
+  };
+  console.log(chunk);
+  return chunk;
+};
+
+router.route('/test')
+  .post(async (req, res) => {
+    try {
+      const { content } = req.body;
+      const chunk = await testOpenAI(content);
+      res.json(chunk);
+    } catch (error) {
+      console.log(error.message);
       res.status(500).json({ error });
     }
   });
