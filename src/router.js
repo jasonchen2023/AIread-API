@@ -1,7 +1,5 @@
 import { Router } from 'express';
-import { CastError } from 'mongoose'; // chatGPT
-import * as Posts from './controllers/chunk_controller';
-import signS3 from './services/s3';
+import openai from './services/openai';
 
 const router = Router();
 
@@ -11,18 +9,21 @@ router.get('/', (req, res) => {
 
 /// your routes will go here
 
-router.get('/sign-s3', signS3);
+// routes for /summaries
+//     post: return openai co
+router.route('/summaries')
+  .post(async (req, res) => {
+    try {
+      openai.summarize(req.body.content);
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  });
 
-// routes for /docs
-//     post: create a new doc
-//     get: get all docs
-
-// routes for /docs/:id
-//     get: get a doc
-//     put: update a doc
-//     delete: delete a doc
+export default router;
 
 // Routes for /posts
+/*
 router.route('/posts')
   .post(async (req, res) => {
     try {
@@ -79,5 +80,4 @@ router.route('/posts/:id')
       }
     }
   });
-
-export default router;
+*/
