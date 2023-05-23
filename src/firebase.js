@@ -1,5 +1,5 @@
+/* eslint-disable import/prefer-default-export */
 /* eslint-disable no-unused-vars */
-// eslint-disable import/prefer-default-export
 
 const admin = require('firebase-admin');
 
@@ -10,5 +10,6 @@ admin.initializeApp({
 });
 
 const firestore = admin.firestore();
+const auth = admin.auth();
 
-// export { addRandomItem };
+export { auth };
