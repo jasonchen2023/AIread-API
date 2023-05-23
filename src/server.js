@@ -2,6 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
+import dotenv from 'dotenv';
+import apiRoutes from './router';
+
+// .env setup
+dotenv.config({ silent: true });
 
 // initialize
 const app = express();
@@ -25,8 +30,9 @@ app.set('views', path.join(__dirname, '../src/views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // To parse the incoming requests with JSON payloads
 
-// additional init stuff should go before hitting the routing
-
+// ROUTING
+// =============================================================================
+app.use('/api', apiRoutes);
 // default index route
 app.get('/', (req, res) => {
   res.send('Hello World');
