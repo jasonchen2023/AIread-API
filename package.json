@@ -29,13 +29,9 @@
     "dotenv": "^16.0.3",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
-<<<<<<< HEAD
+    "firebase-admin": "^11.8.0",
     "morgan": "^1.10.0",
     "openai": "^3.2.1"
-=======
-    "firebase-admin": "^11.8.0",
-    "morgan": "^1.10.0"
->>>>>>> main
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.21.8",
