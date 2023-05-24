@@ -1,17 +1,17 @@
+/* eslint-disable import/prefer-default-export */
 import { Configuration, OpenAIApi } from 'openai';
 import dotenv from 'dotenv';
 
-// .env setup
-dotenv.config({ silent: true });
+require('dotenv').config();
 
 const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
+
 const openai = new OpenAIApi(configuration);
 
 // PROMPT DESIGN
 // can adjust this to fine-tune model output
 // =============================================================================
 const buildPrompt = (content) => {
-  
   // replace this with input from content now
   const age = '21';
 
@@ -36,4 +36,12 @@ const getSummary = async (content) => {
   return summary;
 };
 
-export default getSummary;
+// processes an entire document
+const processText = async (content) => {
+  const chunks = content.split('\n').map((chunk) => { return chunk.trim(); });
+  const summaries = await Promise.all(chunks.map((chunk) => { return getSummary(chunk); }));
+  const tuples = chunks.map((chunk, index) => { return [chunk, summaries[index]]; });
+  return tuples;
+};
+
+export { processText };
