@@ -2,11 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import routes from './router';
 
 // .env setup
-dotenv.config({ silent: true });
+// require('dotenv').config();
 
 // initialize
 const app = express();
@@ -33,6 +32,7 @@ app.use(express.json()); // To parse the incoming requests with JSON payloads
 // ROUTING
 // =============================================================================
 app.use('/api', routes);
+
 // default index route
 app.get('/', (req, res) => {
   res.send('Welcome to the AIread API!');
