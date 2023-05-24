@@ -4,6 +4,9 @@
 * expressjs
 * airbnb eslint rules
 
+## URL
+https://project-airead-api.onrender.com
+
 ## Setup
 To run locally, `npm install` and then `npm start`
 

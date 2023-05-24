@@ -1,40 +1,30 @@
 import { Router } from 'express';
-import { getSummary } from './services/openai';
+import { auth } from './firebase';
+import summariesRouter from './summaries.js';
 
 const router = Router();
+
+
+// token auth middleware for /api routes
+router.use((req, res, next) => {
+  console.log('authorizing request to /api at:', new Date().toLocaleTimeString());
+  const token = req.get('authorization');
+  auth.verifyIdToken(token)
+    .then((decodedToken) => {
+      console.log(`authorized user ${decodedToken.uid}`);
+      next();
+    })
+    .catch((error) => {
+      console.log('failed to authorize user');
+      res.status(401).send('Invalid auth');
+    });
+});
 
 router.get('/', (req, res) => {
   res.json({ message: 'welcome to the airead api!' });
 });
 
-// really basic function for now
-// upgrade this later (some sort of smart slicing, maybe by char count/sentence count)
-const chunkify = (content) => {
-  const chunks = content.split('\n').map((chunk) => { return chunk.trim(); });
-  return chunks;
-};
-
-const processText = async (content) => {
-  // content -> chunk list
-  // chunk list -> summary list (openai)
-  // chunk list + summary list -> tuple list
-  // tuple list -> json out
-  const chunks = chunkify(content);
-  const summaries = await Promise.all(chunks.map((chunk) => { return getSummary(chunk); }));
-  const tuples = chunks.map((chunk, index) => { return [chunk, summaries[index]]; });
-  return tuples;
-};
-
-router.route('/summaries')
-  .post(async (req, res) => {
-    try {
-      const summarized = await processText(req.body.content);
-      res.json(summarized);
-    } catch (error) {
-      console.log(error.message);
-      res.status(500).json({ error });
-    }
-  });
+router.use('/summaries', summariesRouter);
 
 router.route('/test')
   .post(async (req, res) => {

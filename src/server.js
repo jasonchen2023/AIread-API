@@ -2,11 +2,15 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import morgan from 'morgan';
+<<<<<<< HEAD
 import dotenv from 'dotenv';
 import routes from './router';
 
 // .env setup
 dotenv.config({ silent: true });
+=======
+import router from './router';
+>>>>>>> main
 
 // initialize
 const app = express();
@@ -30,12 +34,18 @@ app.set('views', path.join(__dirname, '../src/views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); // To parse the incoming requests with JSON payloads
 
+<<<<<<< HEAD
 // ROUTING
 // =============================================================================
 app.use('/api', routes);
+=======
+// additional init stuff should go before hitting the routing
+app.use('/api', router);
+
+>>>>>>> main
 // default index route
 app.get('/', (req, res) => {
-  res.send('Hello World');
+  res.send('Welcome to the AIread API!');
 });
 
 // START THE SERVER
