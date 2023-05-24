@@ -12,11 +12,12 @@ const openai = new OpenAIApi(configuration);
 // can adjust this to fine-tune model output
 // =============================================================================
 const buildPrompt = (content) => {
-  // replace this with input from content now
+  // replace this with input from frontend, later
   const age = '21';
+  const fieldOfInterest = 'Computer Science, with a minor in Economics';
 
   const background = 'You are an AI summarization agent. Your goal is to distill information down for readers to accelerate learning and comphrehension.';
-  const context = `The reader is ${age} `;
+  const context = `The reader is ${age}, and their field(s) of interest is/are ${fieldOfInterest}. As such, they may require more detail in topics not related to these fields.`;
   const instructions = 'Your summaries should preserve as much important information as possible.';
   const task = 'Please summarize the following text, bullet form.';
   const prompt = `${background}\n${context} ${instructions}\n${task}`;
