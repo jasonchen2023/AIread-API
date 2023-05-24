@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { Configuration, OpenAIApi } from 'openai';
+import dotenv from 'dotenv';
 
 require('dotenv').config();
 
