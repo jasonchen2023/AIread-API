@@ -13,12 +13,23 @@ const openai = new OpenAIApi(configuration);
 // =============================================================================
 const buildPrompt = (content) => {
   // replace this with input from frontend, later
-  const age = '21';
   const fieldOfInterest = 'Computer Science, with a minor in Economics';
+  const intensity = 3; // 0, 1, 2, or 3 (glimpse, skim, analyze, dissect)
 
   const background = 'You are an AI summarization agent. Your goal is to distill information down for readers to accelerate learning and comphrehension.';
-  const context = `The reader is ${age}, and their field(s) of interest is/are ${fieldOfInterest}. As such, they may require more detail in topics not related to these fields.`;
-  const instructions = 'Your summaries should preserve as much important information as possible.';
+  const context = `The reader's field(s) of interest is/are ${fieldOfInterest}. As such, they may require more detail in topics not related to these fields.`;
+  const instructions = 'The summary should preserve as much important information as possible.';
+
+  if (intensity === 0) {
+    instructions.concat(' The summary should be brief, providing a quick glimpse into the content. The reader should be able to quickly read this for a high-level overview of the content.');
+  } else if (intensity === 1) {
+    instructions.concat(' The summary should be medium length, providing a quick skim into the content. The reader should be able to skim this for a medium-level overview of the content.');
+  } else if (intensity === 2) {
+    instructions.concat(' The summary should be detailed, providing a good analysis of the content. The reader should be able to read this summary and gain a strong understanding of the content.');
+  } else if (intensity === 3) {
+    instructions.concat(' The summary should dissect the content, providing a very good analysis of the content, and help the reader fully understand the content efficiently.');
+  }
+
   const task = 'Please summarize the following text, bullet form.';
   const prompt = `${background}\n${context} ${instructions}\n${task}`;
   return prompt;
