@@ -33,8 +33,8 @@ const processText = async (content) => {
   return tuples;
 };
 
-// process an isolated chat request
-const chat = async (content) => {
+// process an isolated chat prompt
+const processChat = async (content) => {
   const response = await openai.createCompletion({
     model: 'text-davinci-003',
     prompt: `${content}`,
@@ -44,4 +44,4 @@ const chat = async (content) => {
   return response.data.choices[0].text;
 };
 
-export { chat, processText };
+export { processChat, processText };
