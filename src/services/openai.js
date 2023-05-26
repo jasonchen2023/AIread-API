@@ -16,7 +16,7 @@ const buildPrompt = (content) => {
   const fieldOfInterest = 'Computer Science, with a minor in Economics';
   const intensity = 3; // 0, 1, 2, or 3 (glimpse, skim, analyze, dissect)
 
-  const background = 'You are an AI summarization agent. Your goal is to distill information down for readers to accelerate learning and comphrehension.';
+  const background = 'You are an AI summarization agent. Your goal is to distill information down for readers to accelerate learning and comprehension.';
   const context = `The reader's field(s) of interest is/are ${fieldOfInterest}. As such, they may require more detail in topics not related to these fields.`;
   const instructions = 'The summary should preserve as much important information as possible.';
 
@@ -31,7 +31,7 @@ const buildPrompt = (content) => {
   }
 
   const task = 'Please summarize the following text, bullet form.';
-  const prompt = `${background}\n${context} ${instructions}\n${task}`;
+  const prompt = `${background}\n${context}\n${instructions}\n${task}`;
   return prompt;
 };
 
