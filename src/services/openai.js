@@ -60,4 +60,16 @@ const processChunk = async (content) => {
   return [content, summary];
 };
 
-export { processText, processChunk };
+// process an isolated chat prompt
+const processChat = async (content) => {
+  console.log(`processing chat request with prompt: ${content}`);
+  const response = await openai.createCompletion({
+    model: 'text-davinci-003',
+    prompt: `${content}`,
+    max_tokens: 1000,
+  });
+
+  return response.data.choices[0].text.trim();
+};
+
+export { processText, processChunk, processChat };
