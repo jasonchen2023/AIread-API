@@ -41,7 +41,7 @@ const processChat = async (content) => {
     max_tokens: 1000,
   });
 
-  return response.data.choices[0].text;
+  return response.data.choices[0].text.trim();
 };
 
 export { processChat, processText };
