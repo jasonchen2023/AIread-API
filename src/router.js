@@ -43,8 +43,11 @@ router.post('/summaries', async (req, res) => {
 
 // chat
 router.post('/chat', async (req, res) => {
+  console.log(req.body);
+  const { content } = req.body;
+  console.log(content);
   try {
-    const response = await processChat(req.body.content);
+    const response = await processChat(content);
     res.status(200).json(response);
   } catch (error) {
     console.log(error.message);
