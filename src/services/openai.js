@@ -11,7 +11,7 @@ const openai = new OpenAIApi(configuration);
 // PROMPT
 // can adjust this to fine-tune model output
 
-const prompt = 'You are an AI summarization agent. Your goal is to distill information down for readers to accelerate learning and comphrehension. Please summarize the following text to bullets, while preserving as much important information as possible.';
+const prompt = 'You are an AI summarization agent. Your goal is to distill information down for readers to accelerate learning and comphrehension. Please summarize the following text in one sentence while preserving as much important information as possible.';
 
 // gets summary for a chunk of text
 const getSummary = async (content) => {
