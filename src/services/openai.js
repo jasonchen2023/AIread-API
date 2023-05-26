@@ -1,6 +1,4 @@
-/* eslint-disable import/prefer-default-export */
 import { Configuration, OpenAIApi } from 'openai';
-import dotenv from 'dotenv';
 
 require('dotenv').config();
 
@@ -14,7 +12,7 @@ const openai = new OpenAIApi(configuration);
 const buildPrompt = (content) => {
   // replace this with input from frontend, later
   const fieldOfInterest = 'Computer Science, with a minor in Economics';
-  const intensity = 3; // 0, 1, 2, or 3 (glimpse, skim, analyze, dissect)
+  const intensity = -1; // 0, 1, 2, or 3 (glimpse, skim, analyze, dissect)
 
   const background = 'You are an AI summarization agent. Your goal is to distill information down for readers to accelerate learning and comprehension.';
   const context = `The reader's field(s) of interest is/are ${fieldOfInterest}. As such, they may require more detail in topics not related to these fields.`;
@@ -48,7 +46,7 @@ const getSummary = async (content) => {
   return summary;
 };
 
-// processes an entire document
+// processes an entire document (chunkification)
 const processText = async (content) => {
   const chunks = content.split('\n').map((chunk) => { return chunk.trim(); });
   const summaries = await Promise.all(chunks.map((chunk) => { return getSummary(chunk); }));
@@ -56,4 +54,10 @@ const processText = async (content) => {
   return tuples;
 };
 
-export { processText };
+// processes one chunk (single api call)
+const processChunk = async (content) => {
+  const summary = await getSummary(content);
+  return [content, summary];
+};
+
+export { processText, processChunk };
