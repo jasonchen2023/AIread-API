@@ -35,6 +35,7 @@ const processText = async (content) => {
 
 // process an isolated chat prompt
 const processChat = async (content) => {
+  console.log(`processing chat request with prompt: ${content}`);
   const response = await openai.createCompletion({
     model: 'text-davinci-003',
     prompt: `${content}`,
