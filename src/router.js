@@ -6,25 +6,25 @@ import { processText, processChunk, processChat } from './services/openai';
 const router = Router();
 
 // token auth middleware for /api routes
-// router.use((req, res, next) => {
-//   console.log('authorizing request to /api at:', new Date().toLocaleTimeString());
-//   const token = req.get('authorization');
+router.use((req, res, next) => {
+  console.log('authorizing request to /api at:', new Date().toLocaleTimeString());
+  const token = req.get('authorization');
 
-//   if (token) {
-//     auth.verifyIdToken(token)
-//       .then((decodedToken) => {
-//         console.log(`authorized user ${decodedToken.uid}`);
-//         next();
-//       })
-//       .catch((error) => {
-//         console.log('failed to authorize user');
-//         res.status(401).send('Invalid auth');
-//       });
-//   } else {
-//     console.log('failed to authorize user');
-//     res.status(401).send('No auth token provided');
-//   }
-// });
+  if (token) {
+    auth.verifyIdToken(token)
+      .then((decodedToken) => {
+        console.log(`authorized user ${decodedToken.uid}`);
+        next();
+      })
+      .catch((error) => {
+        console.log('failed to authorize user');
+        res.status(401).send('Invalid auth');
+      });
+  } else {
+    console.log('failed to authorize user');
+    res.status(401).send('No auth token provided');
+  }
+});
 
 router.get('/', (req, res) => {
   res.status(200).json({ message: 'welcome to the airead api!' });
