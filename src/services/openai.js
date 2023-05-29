@@ -35,16 +35,21 @@ const buildPrompt = (content) => {
 
 // SUMMARY LOGIC
 // =============================================================================
-const getSummary = async (content) => {
-  const response = await openai.createCompletion({
+const getSummary = (content) => {
+  openai.createCompletion({
     model: 'text-davinci-003',
     prompt: buildPrompt(content),
     max_tokens: 1000,
     temperature: 0.7,
-  });
-
-  const summary = response.data.choices[0].text.trim();
-  return summary;
+  })
+    .then((res) => {
+      const summary = res.data.choices[0].text.trim();
+      return summary;
+    })
+    .catch((err) => {
+      console.log(`request to OpenAI failed with error: ${err}, ${err.message}`);
+      throw (err);
+    });
 };
 
 // processes an entire document (chunkified)
@@ -75,15 +80,20 @@ const processChunk = async (content) => {
 };
 
 // process an isolated chat prompt
-const processChat = async (content) => {
+const processChat = (content) => {
   console.log(`processing chat request with prompt: ${content}`);
-  const response = await openai.createCompletion({
+  openai.createCompletion({
     model: 'text-davinci-003',
     prompt: `${content}`,
     max_tokens: 1000,
-  });
-
-  return response.data.choices[0].text.trim();
+  })
+    .then((res) => {
+      return res.data.choices[0].text.trim();
+    })
+    .catch((err) => {
+      console.log(`request to OpenAI failed with error: ${err}, ${err.message}`);
+      throw (err);
+    });
 };
 
 export { processText, processChunk, processChat };
