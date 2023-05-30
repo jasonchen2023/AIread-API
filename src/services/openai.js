@@ -29,7 +29,7 @@ const buildPrompt = (content) => {
   }
 
   const task = 'Please summarize the following text. Bullet form. Output in Markdown.';
-  const prompt = `${background}\n${instructions}\n${task}\n\n${content}`;
+  const prompt = `${content}\n\n${background}\n${instructions}\n${task}`;
   return prompt;
 };
 
@@ -43,7 +43,12 @@ const getSummary = async (content) => {
       max_tokens: 1000,
       temperature: 0.7,
     });
-    const summary = res.data.choices[0].text.trim();
+    let summary = res.data.choices[0].text.trim();
+
+    // summary cleaning
+    summary = summary.replace(/•/g, '-'); // change dots into dashes, for markdown
+    summary = summary.replace(/[\r]/g, ''); // remove `\r`, affects markdown display
+
     console.log('summary:', summary);
     return summary;
   } catch (err) {
