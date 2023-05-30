@@ -91,7 +91,7 @@ const processChat = (content) => {
       return res.data.choices[0].text.trim();
     })
     .catch((err) => {
-      console.log(`request to OpenAI failed with error: ${err}, ${err.message}`);
+      console.log(`request to OpenAI failed with error: ${err.message}`);
       throw (err);
     });
 };
