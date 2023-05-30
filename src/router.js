@@ -35,11 +35,15 @@ router.post('/summaries', async (req, res) => {
   try {
     let summarized;
 
+    // "document" summarization path
     if (req.body.summaryType === 'document') {
       if (!Array.isArray(req.body.content) || !req.body.content.every((doc) => { return typeof doc === 'string'; })) {
         throw new Error('documents must be an array with string elements');
       }
+
       summarized = await processText(req.body.content);
+
+    // "chunk" summarization path
     } else if (req.body.summaryType === 'chunk') {
       summarized = await processChunk(req.body.content);
     } else {

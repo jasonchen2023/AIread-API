@@ -28,28 +28,28 @@ const buildPrompt = (content) => {
     instructions.concat(' The summary should dissect the content, providing a very good analysis of the content, and help the reader fully understand the content efficiently.');
   }
 
-  const task = 'Please summarize the following text in two or three sentences:';
+  const task = 'Please summarize the following text. Bullet form. Output in Markdown.';
   const prompt = `${background}\n${instructions}\n${task}\n\n${content}`;
   return prompt;
 };
 
 // SUMMARY LOGIC
 // =============================================================================
-const getSummary = (content) => {
-  openai.createCompletion({
-    model: 'text-davinci-003',
-    prompt: buildPrompt(content),
-    max_tokens: 1000,
-    temperature: 0.7,
-  })
-    .then((res) => {
-      const summary = res.data.choices[0].text.trim();
-      return summary;
-    })
-    .catch((err) => {
-      console.log(`request to OpenAI failed with error: ${err}, ${err.message}`);
-      throw (err);
+const getSummary = async (content) => {
+  try {
+    const res = await openai.createCompletion({
+      model: 'text-davinci-003',
+      prompt: buildPrompt(content),
+      max_tokens: 1000,
+      temperature: 0.7,
     });
+    const summary = res.data.choices[0].text.trim();
+    console.log('summary:', summary);
+    return summary;
+  } catch (err) {
+    console.log(`request to OpenAI failed with error: ${err}, ${err.message}`);
+    throw err;
+  }
 };
 
 // processes an entire document (chunkified)
@@ -61,9 +61,14 @@ send in request body, as json:
   }
 */
 const processText = async (content) => {
-  const summaries = await Promise.all(content.map((chunk) => { return getSummary(chunk); }));
-  const tuples = content.map((chunk, index) => { return [chunk, summaries[index]]; });
-  return tuples;
+  try {
+    const summaries = await Promise.all(content.map((chunk) => { return getSummary(chunk); }));
+    const tuples = content.map((chunk, index) => { return [chunk, summaries[index]]; });
+    return tuples;
+  } catch (error) {
+    console.error('Failed to process text:', error);
+    throw error; // Or handle it in a way you see fit
+  }
 };
 
 // processes one chunk (single api call)
