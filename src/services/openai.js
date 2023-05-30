@@ -28,8 +28,8 @@ const buildPrompt = (content) => {
     instructions.concat(' The summary should dissect the content, providing a very good analysis of the content, and help the reader fully understand the content efficiently.');
   }
 
-  const task = 'Please summarize the following text. Bullet form. Output in Markdown.';
-  const prompt = `${content}\n\n${background}\n${instructions}\n${task}`;
+  const task = 'Please summarize the above text. Bullet form. Output in Markdown.';
+  const prompt = `${content}\n\n\n\n${background}${instructions}${task}`;
   return prompt;
 };
 
