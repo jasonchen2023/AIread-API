@@ -10,25 +10,22 @@ const openai = new OpenAIApi(configuration);
 // can adjust this to fine-tune model output
 // =============================================================================
 const buildPrompt = (content) => {
-  // replace this with input from frontend, later
-//   const fieldOfInterest = 'Computer Science';
-  const intensity = 0; // 0, 1, 2, or 3 (glimpse, skim, analyze, dissect)
-
   const background = 'You are an AI summarization agent. Your goal is to distill information down for readers to accelerate learning and comprehension.';
-  //   const context = `The reader's field(s) of interest is/are ${fieldOfInterest}. As such, they may require more detail in topics not related to these fields.`;
-  const instructions = 'The summary should preserve as much important information as possible.';
+  const instructions = ' The summary should preserve as much important information as possible.';
+  instructions.concat(' The summary should be short, providing a quick glimpse into the content. The reader should be able to quickly read this for a high-level overview of the content.');
 
+  /*
   if (intensity === 0) {
-    instructions.concat(' The summary should be short, providing a quick glimpse into the content. The reader should be able to quickly read this for a high-level overview of the content.');
-  } else if (intensity === 1) {
+    } else if (intensity === 1) {
     instructions.concat(' The summary should be medium length, providing a quick skim into the content. The reader should be able to skim this for a medium-level overview of the content.');
   } else if (intensity === 2) {
     instructions.concat(' The summary should be detailed, providing a good analysis of the content. The reader should be able to read this summary and gain a strong understanding of the content.');
   } else if (intensity === 3) {
     instructions.concat(' The summary should dissect the content, providing a very good analysis of the content, and help the reader fully understand the content efficiently.');
   }
+  */
 
-  const task = 'Please summarize the above text. Bullet form. Output in Markdown.';
+  const task = ' Please summarize the above text. Bullet form. Output in Markdown.';
   const prompt = `${content}\n\n\n\n${background}${instructions}${task}`;
   return prompt;
 };
