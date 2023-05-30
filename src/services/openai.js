@@ -80,20 +80,19 @@ const processChunk = async (content) => {
 };
 
 // process an isolated chat prompt
-const processChat = (content) => {
+const processChat = async (content) => {
   console.log(`processing chat request with prompt: ${content}`);
-  openai.createCompletion({
-    model: 'text-davinci-003',
-    prompt: `${content}`,
-    max_tokens: 1000,
-  })
-    .then((res) => {
-      return res.data.choices[0].text.trim();
-    })
-    .catch((err) => {
-      console.log(`request to OpenAI failed with error: ${err.message}`);
-      throw (err);
+  try {
+    const response = await openai.createCompletion({
+      model: 'text-davinci-003',
+      prompt: `${content}`,
+      max_tokens: 1000,
     });
+    return response.data.choices[0].text.trim();
+  } catch (err) {
+    console.log(`request to OpenAI failed with error: ${err.message}`);
+    throw (err);
+  }
 };
 
 export { processText, processChunk, processChat };
