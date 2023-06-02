@@ -14,7 +14,7 @@ I couldn't figure out how to test my endpoints with the auth middleware up (I ne
 https://project-airead-api.onrender.com
 
 ## Setup
-To run locally, first retrieve a valid `credentials.json` file and copy it into the root-level directory of the project. One such `credentials.json` file can be found in a pinned message in the CS52 airead slack channel. Then, run `npm install` and then `npm start`
+To run locally, first retrieve a valid `credentials.json` file and copy it into the root-level directory of the project. One such `credentials.json` file can be found in a pinned message in the CS52 airead slack channel. Then, copy the contents of the .env file pinned in the CS52 airead slack channel and paste them into a .env file in the root-level directory of the project. Then, run `npm install` and then `npm start`
 
 ## Deployment
 Settings for render.com:
