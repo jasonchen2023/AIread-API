@@ -34,19 +34,21 @@ const buildPrompt = (content) => {
 // =============================================================================
 const getSummary = async (content) => {
   try {
-    const res = await openai.createCompletion({
-      model: 'text-davinci-003',
-      prompt: buildPrompt(content),
+    let prompt = buildPrompt(content);
+    const res = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: "user", content: prompt }],
       max_tokens: 1000,
       temperature: 0.7,
     });
-    let summary = res.data.choices[0].text.trim();
+
+    let summary = res.data.choices[0].message.content.trim();
 
     // summary cleaning
     summary = summary.replace(/•/g, '-'); // change dots into dashes, for markdown
     summary = summary.replace(/[\r]/g, ''); // remove `\r`, affects markdown display
 
-    console.log('summary:', summary);
+    // console.log('summary:', summary);
     return summary;
   } catch (err) {
     console.log(`request to OpenAI failed with error: ${err}, ${err.message}`);
