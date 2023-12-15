@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { Router } from 'express';
 import { auth } from './firebase';
-import { processText, processChunk, processChat } from './services/openai';
+import { processAllChunks, processChunk, processChat } from './services/openai';
 
 const router = Router();
 
@@ -41,7 +41,7 @@ router.post('/summaries', async (req, res) => {
         throw new Error('documents must be an array with string elements');
       }
 
-      summarized = await processText(req.body.content);
+      summarized = await processAllChunks(req.body.content, req.body.prompt);
 
     // "chunk" summarization path
     } else if (req.body.summaryType === 'chunk') {
