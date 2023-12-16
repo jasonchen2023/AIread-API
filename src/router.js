@@ -59,11 +59,10 @@ router.post('/summaries', async (req, res) => {
 
 // chat
 router.post('/chat', async (req, res) => {
-  const { content } = req.body;
-  console.log(content);
+  const content = req.body.content;
+  const prompt = req.body.prompt;
   try {
-    const response = await processChat(content);
-    console.log(`sending response: ${response}`);
+    const response = await processChat(content, prompt);
     res.status(200).json(response);
   } catch (error) {
     console.log(error.message);
