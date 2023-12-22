@@ -2,6 +2,8 @@
 import { Router } from 'express';
 import { auth } from './firebase';
 import { processAllChunks, processChunk, processChat } from './services/openai';
+import extractText from './services/textExtract';
+
 
 const router = Router();
 
@@ -59,11 +61,23 @@ router.post('/summaries', async (req, res) => {
 
 // chat
 router.post('/chat', async (req, res) => {
-  const content = req.body.content;
-  const prompt = req.body.prompt;
+  const { content } = req.body.content;
+  const { prompt } = req.body.prompt;
   try {
     const response = await processChat(content, prompt);
     res.status(200).json(response);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error });
+  }
+});
+
+// chat
+router.post('/text-extract', async (req, res) => {
+  try {
+    const url = req.body.fileUrl;
+    const text = await extractText(url);
+    res.status(200).json(text);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ error });
