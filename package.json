@@ -24,6 +24,7 @@
     "@babel/core": "^7.21.8",
     "@babel/node": "^7.20.7",
     "@babel/preset-env": "^7.21.5",
+    "@pinecone-database/pinecone": "^1.1.2",
     "body-parser": "^1.20.2",
     "convertapi": "^1.13.0",
     "cors": "^2.8.5",

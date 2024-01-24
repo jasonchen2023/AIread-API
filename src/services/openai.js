@@ -1,4 +1,5 @@
 import { Configuration, OpenAIApi } from 'openai';
+import { retrieveChunks } from './pinecone';
 
 require('dotenv').config();
 
@@ -6,49 +7,38 @@ const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
 
 const openai = new OpenAIApi(configuration);
 
-// PROMPT DESIGN
-// can adjust this to fine-tune model output
-// =============================================================================
-const buildSummarizePrompt = (content) => {
-  const background = 'You are an AI summarization agent. Your goal is to distill information down for readers to accelerate learning and comprehension.';
-  const instructions = ' The summary should preserve as much important information as possible.';
-  instructions.concat(' The summary should be short, providing a quick glimpse into the content. The reader should be able to quickly read this for a high-level overview of the content.');
+const buildPrompt = (content, customPrompt, promptType) => {
+  if (promptType === 'chat-context') {
+    const background = 'You are an AI summarization agent. Your goal is to provide a summarization of the document, which will be passed in as part of the prompt for the chatbot. This will allow the chatbot to answer questions about the document.';
+    const instructions = ' The summary should preserve as much important information as possible about the document.';
+    
+    const task = ' Please summarize the above text.';
+    const prompt = `${content}\n\n\n\n${background}${instructions}${task}`;
+    return prompt;
+    
+  } else {
+    customPrompt = customPrompt ?? "summarize the document.";
 
-  /*
-  if (intensity === 0) {
-    } else if (intensity === 1) {
-    instructions.concat(' The summary should be medium length, providing a quick skim into the content. The reader should be able to skim this for a medium-level overview of the content.');
-  } else if (intensity === 2) {
-    instructions.concat(' The summary should be detailed, providing a good analysis of the content. The reader should be able to read this summary and gain a strong understanding of the content.');
-  } else if (intensity === 3) {
-    instructions.concat(' The summary should dissect the content, providing a very good analysis of the content, and help the reader fully understand the content efficiently.');
+    const background = 'You are an AI agent. Your goal is to distill information down for readers to accelerate learning and comprehension.';
+    let instructions = ` Please perform the following user instruction on the content below. The user instruction is to ${customPrompt}. `;
+    instructions = instructions.concat(' The response should be short, in bullet form, and in Markdown.');
+  
+    const prompt = `${background}${instructions} \n\n\n\n Here is the content: ${content}`;
+    return prompt;
   }
-  */
+}
 
-  const task = ' Please summarize the above text. Bullet form. Output in Markdown.';
-  const prompt = `${content}\n\n\n\n${background}${instructions}${task}`;
-  return prompt;
-};
-
-const buildCustomPrompt = (content, customPrompt) => {
-  const background = 'You are an AI agent. Your goal is to distill information down for readers to accelerate learning and comprehension.';
-  let instructions = ' Please perform the following user instruction on the content below. The user instruction is ' + customPrompt + ". ";
-  instructions = instructions.concat(' The response should be short, in bullet form, and in Markdown.');
-
-  const prompt = `${background}${instructions} \n\n\n\n Here is the content: ${content}`;
-  return prompt;
-};
 
 // SUMMARY LOGIC
 // =============================================================================
-const getSummary = async (content, customPrompt) => {
+const getSummary = async (content, customPrompt, maxTokens = 1000, promptType) => {
   try {
-    let prompt = (customPrompt == null) ? buildSummarizePrompt(content) : buildCustomPrompt(content, customPrompt);
-
+    let prompt = buildPrompt(content, customPrompt, promptType);
+    console.log('prompt', prompt);
     const res = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-3.5-turbo-1106',
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 1000,
+      max_tokens: maxTokens,
       temperature: 0.7,
     });
 
@@ -64,9 +54,9 @@ const getSummary = async (content, customPrompt) => {
 };
 
 // processes an entire document (chunkified). Content = list of strings
-const processAllChunks = async (content, customPrompt) => {
+const processAllChunks = async (content, customPrompt, maxTokens, promptType) => {
   try {
-    const summaries = await Promise.all(content.map((chunk) => { return getSummary(chunk, customPrompt); }));
+    const summaries = await Promise.all(content.map((chunk) => { return getSummary(chunk, customPrompt, maxTokens, promptType); }));
     const tuples = content.map((chunk, index) => { return [chunk, summaries[index]]; });
     return tuples;
   } catch (error) {
@@ -81,11 +71,15 @@ const processChunk = async (content) => {
   return [content, summary];
 };
 
-const buildChatMessage = (content, prompt) => {
-  let instructions = 'You are an AI assistant. Your goal is to answer the users\' questions. The questions may or may not be about the document content. You\'re job is to consider the document content first.';
-  instructions = instructions.concat('If the question is about the document content, use the content to answer the question. If not, mention that the document does not contain the answer. Then, answer based on your own knowledge');
+const buildChatMessage = (contentList, prompt, summary) => {
+  let instructions = 'You are an AI assistant. Your goal is to answer the users\' questions. The questions may or may not be about the document content. Your job is to consider the document content chunks first.';
+  instructions = instructions.concat('If you cannot find the answer, mention that you did not find the answer. Then, answer based on your own knowledge. Otherwise, just present the answer');
+  instructions = instructions.concat(`In the case the user asks for something that requires context from the entire paper, here is a summary: ${summary}
+`);
 
-  let userMessage = "I would like to know the following: " + prompt + ". Here is my reading document: " + content;
+  const content = contentList.map((chunk, index) => `${index + 1} a chunk: : ${chunk}`).join('\n \n');
+  
+  let userMessage = "I would like to know the following: " + prompt + ". Please try to answer using one or more of the chunks or using the summary given if needed: " + content;
   let messages = [
     {role: "system", content: instructions},
     {role: "user", content: userMessage}
@@ -95,12 +89,19 @@ const buildChatMessage = (content, prompt) => {
 }
 
 // process an isolated chat prompt
-const processChat = async (content, prompt) => {
+const processChat = async (prompt, fileId, summary) => {
   try {
+
+    const embeddingList = await getEmbedding(prompt);
+    const embedding = embeddingList[0].embedding;
+
+    const chunkObjects = await retrieveChunks(embedding, fileId);
+    const contentList = chunkObjects.map(chunk => chunk.metadata.content);
+
     const res = await openai.createChatCompletion({
       model: 'gpt-3.5-turbo-1106',
-      messages: buildChatMessage(content, prompt),
-      max_tokens: 200,
+      messages: buildChatMessage(contentList, prompt, summary),
+      max_tokens: 300,
       temperature: 0.7,
     });
     
@@ -112,4 +113,43 @@ const processChat = async (content, prompt) => {
   }
 };
 
-export { processAllChunks, processChunk, processChat };
+const analyzeText = async (prompt, content) => {
+  try {
+    const message = [
+      { role: 'system', content: 'You are a helpful assistant for a reader reading a piece of text.' },
+      { role: 'user', content: `${prompt} ${content}` },
+    ];
+
+    const res = await openai.createChatCompletion({
+      model: 'gpt-3.5-turbo-1106',
+      messages: message,
+      max_tokens: 300,
+      temperature: 0.7,
+    });
+
+    if (res.data.choices && res.data.choices.length > 0) {
+      let chatResponse = res.data.choices[0].message.content.trim();
+      return chatResponse;
+    } else {
+      throw new Error('Invalid response from OpenAI');
+    }
+  } catch (error) {
+    console.error('Error analyzing text:', error);
+    throw error; 
+  }
+};
+
+const getEmbedding = async (chunks) => {
+  try {
+    const response = await openai.createEmbedding({
+      model: 'text-embedding-ada-002',
+      input: chunks,
+      });
+    return response.data.data;
+  } catch (err) {
+    console.error('Error in OpenAI request:', err);
+    throw new Error('Failed to retrieve embeddings from OpenAI');
+  }
+}
+
+export { processAllChunks, processChunk, processChat, getEmbedding, analyzeText };
