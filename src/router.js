@@ -59,7 +59,6 @@ router.post('/summaries', async (req, res) => {
   }
 });
 
-// chat
 router.post('/chat', async (req, res) => {
   try {
     const prompt = req.body.prompt;
@@ -85,7 +84,6 @@ router.post('/text-analysis', async (req, res) => {
   }
 });
 
-// chat
 router.post('/text-extract', async (req, res) => {
   try {
     const url = req.body.fileUrl;

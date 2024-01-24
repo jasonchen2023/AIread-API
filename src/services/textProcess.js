@@ -12,21 +12,14 @@ const extractText = async (pdfUrl) => {
     const result = await convertapi.convert('txt', { File: pdfUrl }, 'pdf');
     const url = result.response.Files[0].Url;
 
-    const response = await fetch(url);  // extract text from the returned link
+    const response = await fetch(url); 
     const data = await response.text();
-
-    // const data = `Whispers in moonlight, secrets softly told,
-    //   Shadows dance, a tale to unfold.
-    //   Nature's lullaby, a silent serenade,
-    //   Night's embrace, dreams cascade.
-    //   Stars witness, as the night unfolds.
-    // `
 
     return data;
 
   } catch (error) {
     console.error('Error extracting text:', error);
-    throw error; // Rethrow the error to propagate it to the caller
+    throw error;
   }
 }
 
@@ -39,14 +32,14 @@ const chunkifyContent = (rawContent, wordsPerChunk, overlap) => {
     currentChunk.push(words[i]);
 
     if (currentChunk.length >= wordsPerChunk) {
-      chunks.push(currentChunk.join(' ')); // Convert currentChunk to string with space between words before pushing
+      chunks.push(currentChunk.join(' ')); 
       i = Math.max(0, i - overlap);
       currentChunk = [];
     }
   }
 
   if (currentChunk.length > 0) {
-    chunks.push(currentChunk.join(' ')); // Convert the last currentChunk to string with space between words before pushing
+    chunks.push(currentChunk.join(' '));
   }
 
   return chunks;
